@@ -1,10 +1,12 @@
 import os  # For file/directory operations
 import sys  # For system-specific parameters and functions
-from src.exception import CustomeException  # Custom exception handler
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from src.exception import CustomException  # Custom exception handler
 from src.logger import logging  # Custom logging configuration
 import pandas as pd  # For data manipulation
 from sklearn.model_selection import train_test_split  # For splitting data
 from dataclasses import dataclass  # For creating configuration class
+from src.components.data_transformation import DataTransformation, DataTransformationConfig
 
 @dataclass
 class DataIngestionConfig:
@@ -17,9 +19,9 @@ class DataIngestionConfig:
         test_data_path (str): Path to save testing data (default: 'artifact/test.csv')
         raw_data_path (str): Path to save raw data (default: 'artifact/raw.csv')
     """
-    train_data_path: str = os.path.join("artifact", "train.csv")
-    test_data_path: str = os.path.join("artifact", "test.csv")
-    raw_data_path: str = os.path.join("artifact", "raw.csv")
+    train_data_path: str = os.path.join("artifacts", "train.csv")
+    test_data_path: str = os.path.join("artifacts", "test.csv")
+    raw_data_path: str = os.path.join("artifacts", "raw.csv")
 
 class DataIngestion:
     """
@@ -54,7 +56,7 @@ class DataIngestion:
         logging.info("Entered the data ingestion method or component")
         try:
             # Step 1: Read source data
-            df = pd.read_csv("d:/ml projectt/src/notebook/data//stud.csv")
+            df = pd.read_csv("d:/ml projectt/src/notebook/data/stud.csv")
             logging.info("Read the dataset")
 
             # Step 2: Create directory if not exists
@@ -78,9 +80,12 @@ class DataIngestion:
             )
         except Exception as e:
             # Handle and log errors using custom exception
-            raise CustomeException(e, sys)
+            raise CustomException(e, sys)
         
 if __name__ == "__main__":
     # When run directly, execute the data ingestion pipeline
     obj = DataIngestion()
-    obj.initiate_data_ingestion()
+    train_data, test_data = obj.initiate_data_ingestion()
+
+    data_transformation = DataTransformation()
+    data_transformation.initiate_data_transformation(train_data, test_data)
